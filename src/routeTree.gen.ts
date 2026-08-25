@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CreerRouteImport } from './routes/creer'
+import { Route as EspaceRouteImport } from './routes/espace'
+import { Route as PlanningRouteImport } from './routes/planning'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreerRoute = CreerRouteImport.update({
+  id: '/creer',
+  path: '/creer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EspaceRoute = EspaceRouteImport.update({
+  id: '/espace',
+  path: '/espace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanningRoute = PlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/creer': typeof CreerRoute
+  '/espace': typeof EspaceRoute
+  '/planning': typeof PlanningRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/creer': typeof CreerRoute
+  '/espace': typeof EspaceRoute
+  '/planning': typeof PlanningRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/creer': typeof CreerRoute
+  '/espace': typeof EspaceRoute
+  '/planning': typeof PlanningRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/creer' | '/espace' | '/planning'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/creer' | '/espace' | '/planning'
+  id: '__root__' | '/' | '/creer' | '/espace' | '/planning'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CreerRoute: typeof CreerRoute
+  EspaceRoute: typeof EspaceRoute
+  PlanningRoute: typeof PlanningRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creer': {
+      id: '/creer'
+      path: '/creer'
+      fullPath: '/creer'
+      preLoaderRoute: typeof CreerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/espace': {
+      id: '/espace'
+      path: '/espace'
+      fullPath: '/espace'
+      preLoaderRoute: typeof EspaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planning': {
+      id: '/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof PlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CreerRoute: CreerRoute,
+  EspaceRoute: EspaceRoute,
+  PlanningRoute: PlanningRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
