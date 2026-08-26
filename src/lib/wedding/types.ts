@@ -22,16 +22,48 @@ export const WEDDING_STYLES = [
   "Festif",
 ] as const;
 
+/** Éléments pouvant déjà être réservés au moment de la création. */
 export const BOOKED_ITEMS = [
   "Le lieu",
   "Le traiteur",
   "Le photographe",
   "La musique",
   "Les tenues",
+  "Les fleurs",
   "Rien pour le moment",
 ] as const;
 
+export type BookedItem = (typeof BOOKED_ITEMS)[number];
+
 export type TaskPriority = "haute" | "moyenne" | "normale";
+
+/** a-faire → à traiter · terminee → cochée par l'utilisateur · deja-fait → déclaré réservé à la création */
+export type TaskStatus = "a-faire" | "terminee" | "deja-fait";
+
+export type TaskCategory =
+  | "budget"
+  | "invites"
+  | "lieu"
+  | "prestataires"
+  | "ceremonie"
+  | "tenues"
+  | "decoration"
+  | "papeterie"
+  | "logistique"
+  | "jour-j";
+
+export const CATEGORY_LABELS: Record<TaskCategory, string> = {
+  budget: "Budget",
+  invites: "Invités",
+  lieu: "Lieu",
+  prestataires: "Prestataires",
+  ceremonie: "Cérémonie",
+  tenues: "Tenues",
+  decoration: "Décoration",
+  papeterie: "Papeterie",
+  logistique: "Logistique",
+  "jour-j": "Jour J",
+};
 
 export type PeriodKey =
   | "12plus"
@@ -58,11 +90,16 @@ export interface Task {
   id: string;
   title: string;
   description: string;
+  category: TaskCategory;
   period: PeriodKey;
   priority: TaskPriority;
   /** ISO date (YYYY-MM-DD) */
   dueDate: string;
-  done: boolean;
+  status: TaskStatus;
+  /** ids de tâches qui devraient idéalement être traitées avant celle-ci. */
+  dependsOn: string[];
+  /** true si la fenêtre idéale est déjà passée au moment de la génération : à rattraper. */
+  catchUp: boolean;
 }
 
 export interface Wedding {
@@ -82,4 +119,10 @@ export interface Wedding {
 export interface WeddingState {
   wedding: Wedding;
   tasks: Task[];
+  /** true uniquement pour le mariage de démonstration chargé volontairement. */
+  isDemo?: boolean;
+}
+
+export function isTaskOpen(task: Task): boolean {
+  return task.status === "a-faire";
 }
