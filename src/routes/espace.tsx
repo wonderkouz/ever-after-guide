@@ -2,12 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppHeader } from "@/components/app-header";
 import { useWedding } from "@/lib/wedding/store";
 import {
+  contextMessage,
   daysUntil,
   formatDateLong,
   formatDateShort,
   formatMoney,
+  isDone,
+  isOverdue,
   progressPercent,
-  upcomingTasks,
+  relevantNow,
 } from "@/lib/wedding/tasks";
 
 export const Route = createFileRoute("/espace")({
@@ -68,14 +71,19 @@ function Dashboard() {
   const { wedding, tasks } = state;
   const days = daysUntil(wedding.date);
   const percent = progressPercent(tasks);
-  const next = upcomingTasks(tasks);
-  const doneCount = tasks.filter((t) => t.done).length;
+  const next = relevantNow(tasks);
+  const doneCount = tasks.filter(isDone).length;
 
   return (
     <div className="min-h-screen bg-cream text-ink">
       <AppHeader />
 
       <main className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
+        {state.isDemo && (
+          <div className="mb-6 border-l-2 border-clay bg-clay/10 px-4 py-3 text-sm text-clay-deep">
+            Données de démonstration
+          </div>
+        )}
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
             <p className="eyebrow">Votre mariage</p>
@@ -106,9 +114,12 @@ function Dashboard() {
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-light">À faire maintenant</h2>
               <Link to="/planning" className="shrink-0 text-sm text-clay-deep hover:underline">
-                Tout le planning
+                Voir tout le planning
               </Link>
             </div>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+              {contextMessage(tasks, wedding.date)}
+            </p>
             {next.length === 0 ? (
               <p className="mt-6 text-sm text-ink-soft">
                 Toutes les tâches sont terminées. Profitez du moment.
@@ -124,7 +135,14 @@ function Dashboard() {
                       className="mt-1 size-5 shrink-0 rounded-full border border-ink/20 transition-colors hover:border-clay"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium">{task.title}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium">{task.title}</p>
+                        {(task.catchUp || isOverdue(task)) && (
+                          <span className="rounded-full bg-clay/10 px-2 py-0.5 text-[10px] font-medium uppercase text-clay-deep">
+                            À rattraper
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-0.5 text-sm text-ink-soft">{task.description}</p>
                       <p className="mt-1 text-xs text-ink/40">
                         Échéance : {formatDateShort(task.dueDate)}
