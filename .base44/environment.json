@@ -2,5 +2,11 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "VITE_BASE44_APP_ID",
+      "description": "Identifiant public de l'app Base44 (URL de l'éditeur Base44). Requis pour initialiser le client @base44/sdk et activer l'auth + les entités.",
+      "requiredAtBoot": false
+    }
+  ]
 }

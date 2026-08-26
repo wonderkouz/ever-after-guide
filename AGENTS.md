@@ -39,3 +39,52 @@ docker compose -f docker-compose.base44.yml up -d
   likely because it was published less than 24h ago.
 - Verify the app is live: `curl -sf -H "Host: external-preview.example.com" http://localhost:3000/`
   should return the Wedly landing page HTML.
+
+## Base44 backend (SDK @base44/sdk)
+
+The app uses Base44 as its backend (auth + database + entities + permissions) via the
+official `@base44/sdk`. This is an **external app** integration (the app is NOT built
+on the Base44 platform; it's a TanStack Start app that talks to Base44's managed backend).
+
+### Wiring
+
+- `@base44/sdk` is installed (`package.json`). The SDK talks to `https://base44.app`
+  over HTTP and stores the auth token in `localStorage` (key `base44_access_token`).
+  **Auth is client-side only** — the SDK is SSR-safe (`createClient` guards `window`),
+  but the token lives in the browser, so auth state is resolved in a `useEffect`
+  (not during SSR), matching the app's existing client-side pattern.
+- `src/lib/base44/client.ts` — lazy singleton `getBase44()` returning the Base44 client,
+  initialized with `appId` from `import.meta.env.VITE_BASE44_APP_ID`. Created lazily
+  (client-side only) to avoid SSR-side network calls.
+- `src/lib/base44/auth.tsx` — `Base44AuthProvider` + `useBase44Auth()` exposing
+  `user`, `loading`, `isAuthenticated`, `login()`, `register()`, `logout()`. Wired into
+  `__root.tsx` RootComponent (wraps `WeddingProvider`). The existing pages are unchanged.
+- **appId**: `VITE_BASE44_APP_ID` (public Base44 app identifier) — provided via the
+  platform-managed env file (`/run/base44/app.env`), loaded by compose `env_file`
+  (with `.env.base44-defaults` as the empty placeholder). Vite's `loadEnv` (via the
+  Lovable config) injects it into `import.meta.env.VITE_BASE44_APP_ID`.
+
+### Entity access (next step — entities must be created in the Base44 dashboard)
+
+```ts
+import { getBase44 } from "@/lib/base44/client";
+const base44 = getBase44();
+const weddings = await base44.entities.Wedding.list();   // CRUD via base44.entities.<Name>
+```
+
+Entities (`Wedding`, `Task`, …) and their permissions (owner/auth) are defined in the
+**Base44 dashboard** (Data → entities), not in code. The SDK reads them at runtime.
+
+### Auth flow (native Base44)
+
+- `base44.auth.loginViaEmailPassword(email, password)` → sets token (localStorage) + returns user.
+- `base44.auth.me()` → current user (GET `/apps/<appId>/entities/User/me`).
+- `base44.auth.register({ email, password, full_name })` → creates a user (then login).
+- `base44.auth.logout()` → removes token + redirects to Base44 logout endpoint.
+
+### Verify the connection
+
+```sh
+# appId present in the running container (don't print the value):
+docker compose -f docker-compose.base44.yml exec -T web sh -c 'printenv VITE_BASE44_APP_ID >/dev/null && echo present || echo missing'
+```
