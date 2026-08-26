@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CreerRouteImport } from './routes/creer'
 import { Route as EspaceRouteImport } from './routes/espace'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PlanningRouteImport } from './routes/planning'
+import { Route as SignupRouteImport } from './routes/signup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,9 +31,19 @@ const EspaceRoute = EspaceRouteImport.update({
   path: '/espace',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlanningRoute = PlanningRouteImport.update({
   id: '/planning',
   path: '/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +51,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/login': typeof LoginRoute
   '/planning': typeof PlanningRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/login': typeof LoginRoute
   '/planning': typeof PlanningRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/login': typeof LoginRoute
   '/planning': typeof PlanningRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/creer' | '/espace' | '/planning'
+  fullPaths: '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/creer' | '/espace' | '/planning'
-  id: '__root__' | '/' | '/creer' | '/espace' | '/planning'
+  to: '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
+  id:
+    '__root__' | '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CreerRoute: typeof CreerRoute
   EspaceRoute: typeof EspaceRoute
+  LoginRoute: typeof LoginRoute
   PlanningRoute: typeof PlanningRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +113,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/planning': {
       id: '/planning'
       path: '/planning'
       fullPath: '/planning'
       preLoaderRoute: typeof PlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,7 +141,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreerRoute: CreerRoute,
   EspaceRoute: EspaceRoute,
+  LoginRoute: LoginRoute,
   PlanningRoute: PlanningRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

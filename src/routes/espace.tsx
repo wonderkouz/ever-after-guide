@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RequireAuth } from "@/lib/base44/require-auth";
 import { AppHeader } from "@/components/app-header";
 import { useWedding } from "@/lib/wedding/store";
 import {
@@ -28,7 +29,11 @@ export const Route = createFileRoute("/espace")({
       },
     ],
   }),
-  component: Dashboard,
+  component: () => (
+    <RequireAuth>
+      <Dashboard />
+    </RequireAuth>
+  ),
 });
 
 const PRIORITY_STYLE = {

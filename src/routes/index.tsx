@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
+import { RedirectIfAuth } from "@/lib/base44/require-auth";
 import heroImage from "@/assets/hero-wedding.jpg";
 
 export const Route = createFileRoute("/")({
@@ -18,7 +19,11 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: Landing,
+  component: () => (
+    <RedirectIfAuth>
+      <Landing />
+    </RedirectIfAuth>
+  ),
 });
 
 const STEPS = [

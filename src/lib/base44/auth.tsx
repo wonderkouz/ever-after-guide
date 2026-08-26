@@ -81,3 +81,11 @@ export function useBase44Auth(): Base44AuthContextValue {
   }
   return ctx;
 }
+
+/** Affiche le prénom de l'utilisateur (ou son e-mail, ou "Mon compte"). */
+export function getUserDisplayName(user: Base44User | null): string {
+  if (!user) return "";
+  const name = (user.full_name as string) || (user.first_name as string) || (user.name as string);
+  if (name) return name.split(" ")[0];
+  return user.email || "Mon compte";
+}

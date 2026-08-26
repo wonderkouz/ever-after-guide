@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RequireAuth } from "@/lib/base44/require-auth";
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { useWedding } from "@/lib/wedding/store";
@@ -29,7 +30,11 @@ export const Route = createFileRoute("/planning")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Planning,
+  component: () => (
+    <RequireAuth>
+      <Planning />
+    </RequireAuth>
+  ),
 });
 
 function Planning() {

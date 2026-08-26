@@ -133,10 +133,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WeddingProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </WeddingProvider>
+      <Base44AuthProvider>
+        <WeddingProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </WeddingProvider>
+      </Base44AuthProvider>
     </QueryClientProvider>
   );
 

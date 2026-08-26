@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RequireAuth } from "@/lib/base44/require-auth";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { useWedding } from "@/lib/wedding/store";
@@ -24,7 +25,11 @@ export const Route = createFileRoute("/creer")({
       },
     ],
   }),
-  component: CreateWedding,
+  component: () => (
+    <RequireAuth>
+      <CreateWedding />
+    </RequireAuth>
+  ),
 });
 
 const inputClass =
