@@ -115,13 +115,30 @@ export interface Wedding {
   createdAt: string;
 }
 
-/** État applicatif complet — extensible (budget, devis, invités, prestataires…). */
+/** État applicatif complet — un seul objet racine par mariage. */
 export interface WeddingState {
   wedding: Wedding;
   tasks: Task[];
+  vendors: Vendor[];
+  conversations: Conversation[];
+  messages: Message[];
+  guests: Guest[];
+  tables: SeatingTable[];
+  moodboards: Moodboard[];
   /** true uniquement pour le mariage de démonstration chargé volontairement. */
   isDemo?: boolean;
 }
+
+/** Collections vides — base de tout nouvel état et normalisation des états anciens. */
+export const EMPTY_COLLECTIONS = {
+  vendors: [] as Vendor[],
+  conversations: [] as Conversation[],
+  messages: [] as Message[],
+  guests: [] as Guest[],
+  tables: [] as SeatingTable[],
+  moodboards: [] as Moodboard[],
+};
+
 
 export function isTaskOpen(task: Task): boolean {
   return task.status === "a-faire";
