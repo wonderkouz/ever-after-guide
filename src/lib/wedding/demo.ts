@@ -1,5 +1,5 @@
 import { generateTasks } from "./tasks";
-import type { Wedding, WeddingState } from "./types";
+import { EMPTY_COLLECTIONS, type Wedding, type WeddingState } from "./types";
 
 /**
  * Mariage fictif réservé au développement et aux démonstrations.
@@ -25,5 +25,5 @@ export function demoWedding(): Wedding {
 
 export function demoState(): WeddingState {
   const wedding = demoWedding();
-  return { wedding, tasks: generateTasks(wedding), isDemo: true };
+  return { ...EMPTY_COLLECTIONS, wedding, tasks: generateTasks(wedding), isDemo: true };
 }
