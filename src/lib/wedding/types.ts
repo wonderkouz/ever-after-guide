@@ -115,14 +115,264 @@ export interface Wedding {
   createdAt: string;
 }
 
-/** État applicatif complet — extensible (budget, devis, invités, prestataires…). */
+/** État applicatif complet — un seul objet racine par mariage. */
 export interface WeddingState {
   wedding: Wedding;
   tasks: Task[];
+  vendors: Vendor[];
+  conversations: Conversation[];
+  messages: Message[];
+  guests: Guest[];
+  tables: SeatingTable[];
+  moodboards: Moodboard[];
   /** true uniquement pour le mariage de démonstration chargé volontairement. */
   isDemo?: boolean;
 }
 
+/** Collections vides — base de tout nouvel état et normalisation des états anciens. */
+export const EMPTY_COLLECTIONS = {
+  vendors: [] as Vendor[],
+  conversations: [] as Conversation[],
+  messages: [] as Message[],
+  guests: [] as Guest[],
+  tables: [] as SeatingTable[],
+  moodboards: [] as Moodboard[],
+};
+
+
 export function isTaskOpen(task: Task): boolean {
   return task.status === "a-faire";
+}
+
+/* ------------------------------------------------------------------ *
+ * PRESTATAIRES
+ * ------------------------------------------------------------------ */
+
+export const VENDOR_CATEGORIES = [
+  "lieu",
+  "traiteur",
+  "photographe",
+  "videaste",
+  "dj",
+  "fleuriste",
+  "decorateur",
+  "wedding-planner",
+  "coiffeur",
+  "maquilleur",
+  "papeterie",
+  "transport",
+  "autre",
+] as const;
+
+export type VendorCategory = (typeof VENDOR_CATEGORIES)[number];
+
+export const VENDOR_CATEGORY_LABELS: Record<VendorCategory, string> = {
+  lieu: "Lieu",
+  traiteur: "Traiteur",
+  photographe: "Photographe",
+  videaste: "Vidéaste",
+  dj: "DJ / Musique",
+  fleuriste: "Fleuriste",
+  decorateur: "Décorateur",
+  "wedding-planner": "Wedding planner",
+  coiffeur: "Coiffeur",
+  maquilleur: "Maquilleur",
+  papeterie: "Papeterie",
+  transport: "Transport",
+  autre: "Autre",
+};
+
+export const VENDOR_STATUSES = [
+  "a-contacter",
+  "contacte",
+  "devis-recu",
+  "reserve",
+  "ecarte",
+] as const;
+
+export type VendorStatus = (typeof VENDOR_STATUSES)[number];
+
+export const VENDOR_STATUS_LABELS: Record<VendorStatus, string> = {
+  "a-contacter": "À contacter",
+  contacte: "Contacté",
+  "devis-recu": "Devis reçu",
+  reserve: "Réservé",
+  ecarte: "Écarté",
+};
+
+/** Document rattaché à un prestataire (devis, contrat, facture…). */
+export interface VendorDocument {
+  id: string;
+  name: string;
+  /** URL ou data-url ; le stockage distant arrivera avec le backend. */
+  url?: string;
+  kind: "devis" | "contrat" | "facture" | "autre";
+  addedAt: string;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  category: VendorCategory;
+  contactFirstName: string;
+  email: string;
+  phone: string;
+  website: string;
+  status: VendorStatus;
+  /** Montant du devis, en euros. */
+  quoteAmount: number | null;
+  /** Montant déjà payé, en euros. */
+  paidAmount: number | null;
+  notes: string;
+  documents: VendorDocument[];
+  /** Relations : tâches du planning et moodboards liés. */
+  taskIds: string[];
+  moodboardIds: string[];
+  createdAt: string;
+}
+
+/* ------------------------------------------------------------------ *
+ * MESSAGERIE
+ * ------------------------------------------------------------------ */
+
+export type MessageAuthor = "couple" | "vendor";
+
+export interface MessageAttachment {
+  id: string;
+  name: string;
+  url?: string;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  author: MessageAuthor;
+  body: string;
+  sentAt: string;
+  readAt: string | null;
+  attachments: MessageAttachment[];
+}
+
+export interface Conversation {
+  id: string;
+  /** Une conversation peut être rattachée à un prestataire. */
+  vendorId: string | null;
+  subject: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Lien d'invitation permettant au prestataire de rejoindre la conversation. */
+  invite: { token: string; acceptedAt: string | null } | null;
+  /** Notifications à venir : préférence par conversation. */
+  notifications: boolean;
+}
+
+/* ------------------------------------------------------------------ *
+ * INVITÉS & PLAN DE TABLE
+ * ------------------------------------------------------------------ */
+
+export const RSVP_STATUSES = ["a-confirmer", "confirme", "decline"] as const;
+export type RsvpStatus = (typeof RSVP_STATUSES)[number];
+
+export const RSVP_LABELS: Record<RsvpStatus, string> = {
+  "a-confirmer": "À confirmer",
+  confirme: "Confirmé",
+  decline: "Décliné",
+};
+
+export type GuestAgeGroup = "adulte" | "enfant";
+
+export interface Guest {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  /** Groupe / famille : « Famille de Marie », « Amis fac »… */
+  group: string;
+  rsvp: RsvpStatus;
+  hasPlusOne: boolean;
+  plusOneCount: number;
+  ageGroup: GuestAgeGroup;
+  diet: string;
+  allergies: string;
+  constraints: string;
+  tableId: string | null;
+  notes: string;
+  createdAt: string;
+}
+
+export type TableShape = "ronde" | "rectangulaire" | "ovale" | "carree" | "honneur";
+
+export const TABLE_SHAPE_LABELS: Record<TableShape, string> = {
+  ronde: "Ronde",
+  rectangulaire: "Rectangulaire",
+  ovale: "Ovale",
+  carree: "Carrée",
+  honneur: "Table d'honneur",
+};
+
+export interface SeatingTable {
+  id: string;
+  name: string;
+  seats: number;
+  shape: TableShape;
+  /** Emplacement dans la salle ; `position` prépare l'éditeur visuel. */
+  location: string;
+  position?: { x: number; y: number };
+  createdAt: string;
+}
+
+/* ------------------------------------------------------------------ *
+ * INSPIRATIONS / MOODBOARDS
+ * ------------------------------------------------------------------ */
+
+export const MOODBOARD_THEMES = [
+  "ceremonie",
+  "reception",
+  "fleurs",
+  "decoration",
+  "papeterie",
+  "tenues",
+  "soiree",
+  "autre",
+] as const;
+
+export type MoodboardTheme = (typeof MOODBOARD_THEMES)[number];
+
+export const MOODBOARD_THEME_LABELS: Record<MoodboardTheme, string> = {
+  ceremonie: "Cérémonie",
+  reception: "Réception",
+  fleurs: "Fleurs",
+  decoration: "Décoration",
+  papeterie: "Papeterie",
+  tenues: "Tenues",
+  soiree: "Soirée",
+  autre: "Autre",
+};
+
+export interface MoodboardImage {
+  id: string;
+  url: string;
+  caption: string;
+  /** Origine : import utilisateur ou source externe autorisée. */
+  source: "upload" | "url" | "ia";
+  addedAt: string;
+}
+
+export interface Moodboard {
+  id: string;
+  title: string;
+  theme: MoodboardTheme;
+  description: string;
+  tags: string[];
+  /** Palette : codes couleurs hex. */
+  colors: string[];
+  notes: string;
+  source: string;
+  estimatedBudget: number | null;
+  images: MoodboardImage[];
+  /** Relations : prestataires et tâches liés. */
+  vendorIds: string[];
+  taskIds: string[];
+  createdAt: string;
 }

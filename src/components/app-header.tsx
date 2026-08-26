@@ -1,5 +1,15 @@
 import { Link } from "@tanstack/react-router";
 
+/** Modules disponibles dans l'espace mariage. */
+const LINKS = [
+  { to: "/espace", label: "Accueil" },
+  { to: "/planning", label: "Planning" },
+  { to: "/prestataires", label: "Prestataires" },
+  { to: "/invites", label: "Invités" },
+  { to: "/inspirations", label: "Inspirations" },
+] as const;
+
+/** Modules à venir : affichés pour donner la structure complète, non cliquables. */
 const SOON = ["Budget", "Devis", "Assistant"];
 
 export function AppHeader() {
@@ -10,22 +20,17 @@ export function AppHeader() {
           Wedly
         </Link>
         <nav className="flex min-w-0 items-center gap-1 overflow-x-auto text-sm">
-          <Link
-            to="/espace"
-            activeProps={{ className: "bg-sand text-ink" }}
-            inactiveProps={{ className: "text-ink-soft hover:text-ink" }}
-            className="shrink-0 rounded-full px-3.5 py-2 transition-colors"
-          >
-            Accueil
-          </Link>
-          <Link
-            to="/planning"
-            activeProps={{ className: "bg-sand text-ink" }}
-            inactiveProps={{ className: "text-ink-soft hover:text-ink" }}
-            className="shrink-0 rounded-full px-3.5 py-2 transition-colors"
-          >
-            Planning
-          </Link>
+          {LINKS.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              activeProps={{ className: "bg-sand text-ink" }}
+              inactiveProps={{ className: "text-ink-soft hover:text-ink" }}
+              className="shrink-0 rounded-full px-3.5 py-2 transition-colors"
+            >
+              {l.label}
+            </Link>
+          ))}
           {SOON.map((label) => (
             <span
               key={label}
