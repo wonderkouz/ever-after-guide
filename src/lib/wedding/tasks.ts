@@ -136,7 +136,7 @@ export function generateTasks(wedding: Wedding): Task[] {
     const idealMs = wMs - t.daysBefore * DAY;
     const isLate = idealMs < now && daysLeft >= 0;
     const dueMs = isLate
-      ? Math.min(now + Math.round((lateOrder.get(t.id)! + 1) * step) * DAY, wMs)
+      ? Math.min(now + Math.round(((lateOrder.get(t.id) ?? 0) + 1) * step) * DAY, wMs)
       : idealMs;
 
     const isBooked = t.bookedBy ? booked.has(t.bookedBy) : false;
