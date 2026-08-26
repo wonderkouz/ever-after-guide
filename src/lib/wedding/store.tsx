@@ -1,8 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { demoState } from "./demo";
 import { generateTasks } from "./tasks";
 import type { Wedding, WeddingState } from "./types";
 
-const STORAGE_KEY = "wedly.state.v1";
+const STORAGE_KEY = "wedly.state.v2";
+const LEGACY_KEYS = ["wedly.state.v1"];
 
 interface WeddingContextValue {
   /** false tant que la lecture du stockage local n'a pas eu lieu (SSR-safe). */
@@ -10,6 +12,8 @@ interface WeddingContextValue {
   state: WeddingState | null;
   createWedding: (wedding: Omit<Wedding, "createdAt">) => void;
   toggleTask: (taskId: string) => void;
+  /** Charge le mariage fictif de démonstration (clairement identifié comme tel). */
+  loadDemo: () => void;
   reset: () => void;
 }
 
@@ -21,6 +25,8 @@ export function WeddingProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      // Les anciens plannings statiques ne sont plus compatibles : on les efface.
+      LEGACY_KEYS.forEach((k) => window.localStorage.removeItem(k));
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) setState(JSON.parse(raw) as WeddingState);
     } catch {
@@ -40,11 +46,10 @@ export function WeddingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const createWedding = useCallback(
-    (wedding: Omit<Wedding, "createdAt">) => {
-      persist({
-        wedding: { ...wedding, createdAt: new Date().toISOString() },
-        tasks: generateTasks(wedding.date),
-      });
+    (input: Omit<Wedding, "createdAt">) => {
+      const wedding: Wedding = { ...input, createdAt: new Date().toISOString() };
+      // Un mariage réel remplace systématiquement toute donnée de démonstration.
+      persist({ wedding, tasks: generateTasks(wedding) });
     },
     [persist],
   );
@@ -55,7 +60,11 @@ export function WeddingProvider({ children }: { children: ReactNode }) {
         if (!current) return current;
         const next: WeddingState = {
           ...current,
-          tasks: current.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)),
+          tasks: current.tasks.map((t) =>
+            t.id === taskId
+              ? { ...t, status: t.status === "a-faire" ? "terminee" : "a-faire" }
+              : t,
+          ),
         };
         try {
           window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -68,11 +77,12 @@ export function WeddingProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const loadDemo = useCallback(() => persist(demoState()), [persist]);
   const reset = useCallback(() => persist(null), [persist]);
 
   const value = useMemo<WeddingContextValue>(
-    () => ({ ready, state, createWedding, toggleTask, reset }),
-    [ready, state, createWedding, toggleTask, reset],
+    () => ({ ready, state, createWedding, toggleTask, loadDemo, reset }),
+    [ready, state, createWedding, toggleTask, loadDemo, reset],
   );
 
   return <WeddingContext.Provider value={value}>{children}</WeddingContext.Provider>;
