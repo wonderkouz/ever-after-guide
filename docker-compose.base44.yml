@@ -11,3 +11,8 @@ services:
     environment:
       - NODE_ENV=development
       - BASE44_PUBLIC_HOST_SUFFIX=${BASE44_PUBLIC_HOST_SUFFIX:-}
+    env_file:
+      - path: ./.env.base44-defaults
+        required: true
+      - path: /run/base44/app.env
+        required: false

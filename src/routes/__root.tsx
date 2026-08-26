@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { WeddingProvider } from "../lib/wedding/store";
+import { Base44AuthProvider } from "../lib/base44/auth";
 
 
 function NotFoundComponent() {
