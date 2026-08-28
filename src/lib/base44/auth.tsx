@@ -82,6 +82,8 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: user !== null,
     login,
     register,
+    verifyOtp,
+    resendOtp,
     logout,
   };
 
