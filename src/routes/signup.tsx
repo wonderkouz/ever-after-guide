@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AuthHeader } from "@/components/auth-header";
-import { useBase44Auth } from "@/lib/base44/auth";
+import { useBase44Auth, getBase44ErrorMessage } from "@/lib/base44/auth";
 import { RedirectIfAuth } from "@/lib/base44/require-auth";
 
 export const Route = createFileRoute("/signup")({
@@ -18,17 +18,21 @@ const inputClass =
 
 function Signup() {
   const navigate = useNavigate();
-  const { register, login } = useBase44Auth();
+  const { register, verifyOtp, resendOtp, login } = useBase44Auth();
+  const [step, setStep] = useState<"form" | "otp">("form");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function submit(e: FormEvent) {
+  async function submitRegister(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setInfo("");
     if (password !== confirm) {
       setError("Les mots de passe ne correspondent pas.");
       return;
@@ -40,13 +44,103 @@ function Signup() {
     setLoading(true);
     try {
       await register(email, password, firstName);
-      await login(email, password);
-      navigate({ to: "/espace" });
-    } catch {
-      setError("Impossible de créer le compte. Cet e-mail est peut-être déjà utilisé.");
+      setStep("otp");
+    } catch (err) {
+      setError(getBase44ErrorMessage(err, "Impossible de créer le compte."));
     } finally {
       setLoading(false);
     }
+  }
+
+  async function submitOtp(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    setLoading(true);
+    try {
+      await verifyOtp(email, otpCode);
+      await login(email, password);
+      navigate({ to: "/espace" });
+    } catch (err) {
+      setError(getBase44ErrorMessage(err, "Code de vérification incorrect."));
+      setOtpCode("");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setError("");
+    setInfo("");
+    try {
+      await resendOtp(email);
+      setInfo("Un nouveau code a été envoyé à votre adresse e-mail.");
+    } catch (err) {
+      setError(getBase44ErrorMessage(err, "Impossible de renvoyer le code."));
+    }
+  }
+
+  if (step === "otp") {
+    return (
+      <div className="min-h-screen bg-cream text-ink">
+        <AuthHeader />
+        <main className="mx-auto max-w-md px-5 py-12 sm:px-6 sm:py-20">
+          <h1 className="text-4xl font-light tracking-tight sm:text-5xl">
+            Vérifiez votre adresse e-mail
+          </h1>
+          <p className="mt-3 text-ink-soft">
+            Nous avons envoyé un code de vérification à votre adresse e-mail.
+          </p>
+          <p className="mt-2 text-sm font-medium">{email}</p>
+          <form onSubmit={submitOtp} className="mt-8 space-y-5">
+            <label className="block">
+              <span className="text-sm font-medium">Code de vérification</span>
+              <input
+                className={inputClass}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                required
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="123456"
+              />
+            </label>
+            {error && <p className="text-sm text-clay-deep">{error}</p>}
+            {info && <p className="text-sm text-ink-soft">{info}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-full bg-ink px-7 py-3.5 font-medium text-cream transition-colors hover:bg-clay-deep disabled:opacity-50"
+            >
+              {loading ? "Vérification…" : "Vérifier mon e-mail"}
+            </button>
+          </form>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={loading}
+            className="mt-4 w-full text-center text-sm text-ink-soft transition-colors hover:text-ink disabled:opacity-50"
+          >
+            Renvoyer le code
+          </button>
+          <p className="mt-6 text-center text-sm text-ink-soft">
+            Mauvaise adresse e-mail ?{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setStep("form");
+                setError("");
+                setInfo("");
+                setOtpCode("");
+              }}
+              className="font-medium text-clay-deep hover:underline"
+            >
+              Modifier
+            </button>
+          </p>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -55,7 +149,7 @@ function Signup() {
       <main className="mx-auto max-w-md px-5 py-12 sm:px-6 sm:py-20">
         <h1 className="text-4xl font-light tracking-tight sm:text-5xl">Créer mon compte</h1>
         <p className="mt-3 text-ink-soft">Votre mariage, organisé simplement.</p>
-        <form onSubmit={submit} className="mt-8 space-y-5">
+        <form onSubmit={submitRegister} className="mt-8 space-y-5">
           <label className="block">
             <span className="text-sm font-medium">Prénom</span>
             <input

@@ -19,6 +19,10 @@ interface Base44AuthContextValue {
   login: (email: string, password: string) => Promise<Base44User | null>;
   /** Inscription (Base44 native). Ne connecte pas automatiquement. */
   register: (email: string, password: string, fullName?: string) => Promise<unknown>;
+  /** Vérification du code OTP envoyé par e-mail après l'inscription. */
+  verifyOtp: (email: string, otpCode: string) => Promise<unknown>;
+  /** Renvoi du code OTP. */
+  resendOtp: (email: string) => Promise<unknown>;
   /** Déconnexion (Base44 native — supprime le token localStorage + redirige). */
   logout: () => void;
 }
@@ -54,6 +58,16 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
     return base44.auth.register(payload);
   };
 
+  const verifyOtp = async (email: string, otpCode: string) => {
+    const base44 = getBase44();
+    return base44.auth.verifyOtp({ email, otpCode });
+  };
+
+  const resendOtp = async (email: string) => {
+    const base44 = getBase44();
+    return base44.auth.resendOtp(email);
+  };
+
   const logout = () => {
     const base44 = getBase44();
     setUser(null);
@@ -80,6 +94,12 @@ export function useBase44Auth(): Base44AuthContextValue {
     throw new Error("useBase44Auth doit être utilisé à l'intérieur d'un Base44AuthProvider");
   }
   return ctx;
+}
+
+/** Extrait le message d'erreur réel retourné par Base44 (au lieu d'un message générique). */
+export function getBase44ErrorMessage(error: unknown, fallback = "Une erreur est survenue."): string {
+  const e = error as { message?: string; response?: { data?: { message?: string } } };
+  return e?.response?.data?.message || e?.message || fallback;
 }
 
 /** Affiche le prénom de l'utilisateur (ou son e-mail, ou "Mon compte"). */

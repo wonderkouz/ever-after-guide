@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AuthHeader } from "@/components/auth-header";
-import { useBase44Auth } from "@/lib/base44/auth";
+import { useBase44Auth, getBase44ErrorMessage } from "@/lib/base44/auth";
 import { RedirectIfAuth } from "@/lib/base44/require-auth";
 
 export const Route = createFileRoute("/login")({
@@ -31,8 +31,8 @@ function Login() {
     try {
       const user = await login(email, password);
       if (user) navigate({ to: "/espace" });
-    } catch {
-      setError("E-mail ou mot de passe incorrect.");
+    } catch (err) {
+      setError(getBase44ErrorMessage(err, "E-mail ou mot de passe incorrect."));
     } finally {
       setLoading(false);
     }
