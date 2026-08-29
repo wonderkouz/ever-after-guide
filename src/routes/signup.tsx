@@ -46,7 +46,20 @@ function Signup() {
       await register(email, password, firstName);
       setStep("otp");
     } catch (err) {
-      setError(getBase44ErrorMessage(err, "Impossible de créer le compte."));
+      const msg = getBase44ErrorMessage(err, "").toLowerCase();
+      // Si l'utilisateur existe déjà / est déjà vérifié → tenter la connexion directe
+      if (msg.includes("already") || msg.includes("exists") || msg.includes("verified")) {
+        try {
+          await login(email, password);
+          navigate({ to: "/espace" });
+          return;
+        } catch {
+          // Utilisateur existant mais non vérifié → afficher l'écran OTP
+          setStep("otp");
+        }
+      } else {
+        setError(getBase44ErrorMessage(err, "Impossible de créer le compte."));
+      }
     } finally {
       setLoading(false);
     }
@@ -58,12 +71,27 @@ function Signup() {
     setInfo("");
     setLoading(true);
     try {
-      await verifyOtp(email, otpCode);
-      await login(email, password);
+      const res = await verifyOtp(email, otpCode);
+      // Si verifyOtp n'a pas retourné de token, on connecte avec email/mot de passe
+      if (!res?.access_token) {
+        await login(email, password);
+      }
       navigate({ to: "/espace" });
     } catch (err) {
-      setError(getBase44ErrorMessage(err, "Code de vérification incorrect."));
-      setOtpCode("");
+      const msg = getBase44ErrorMessage(err, "").toLowerCase();
+      if (msg.includes("already verified")) {
+        // Utilisateur déjà vérifié → connexion directe, pas besoin d'OTP
+        try {
+          await login(email, password);
+          navigate({ to: "/espace" });
+          return;
+        } catch {
+          setError("Votre compte est déjà vérifié. Essayez de vous connecter.");
+        }
+      } else {
+        setError(getBase44ErrorMessage(err, "Code de vérification incorrect."));
+        setOtpCode("");
+      }
     } finally {
       setLoading(false);
     }

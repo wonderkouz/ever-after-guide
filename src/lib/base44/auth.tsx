@@ -60,7 +60,14 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyOtp = async (email: string, otpCode: string) => {
     const base44 = getBase44();
-    return base44.auth.verifyOtp({ email, otpCode });
+    const res = await base44.auth.verifyOtp({ email, otpCode });
+    // Si verifyOtp retourne un access_token, on l'enregistre et on récupère l'utilisateur
+    if (res?.access_token) {
+      base44.auth.setToken(res.access_token, true);
+      const u = await base44.auth.me();
+      setUser(u as Base44User);
+    }
+    return res;
   };
 
   const resendOtp = async (email: string) => {
