@@ -23,6 +23,10 @@ interface Base44AuthContextValue {
   verifyOtp: (email: string, otpCode: string) => Promise<unknown>;
   /** Renvoi du code OTP. */
   resendOtp: (email: string) => Promise<unknown>;
+  /** Demander la réinitialisation du mot de passe (envoie un e-mail avec un token). */
+  requestPasswordReset: (email: string) => Promise<unknown>;
+  /** Réinitialiser le mot de passe avec un token reçu par e-mail. */
+  resetPassword: (resetToken: string, newPassword: string) => Promise<unknown>;
   /** Déconnexion (Base44 native — supprime le token localStorage + redirige). */
   logout: () => void;
 }
@@ -75,6 +79,16 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
     return base44.auth.resendOtp(email);
   };
 
+  const requestPasswordReset = async (email: string) => {
+    const base44 = getBase44();
+    return base44.auth.resetPasswordRequest(email);
+  };
+
+  const resetPassword = async (resetToken: string, newPassword: string) => {
+    const base44 = getBase44();
+    return base44.auth.resetPassword({ resetToken, newPassword });
+  };
+
   const logout = () => {
     const base44 = getBase44();
     setUser(null);
@@ -91,6 +105,8 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
     register,
     verifyOtp,
     resendOtp,
+    requestPasswordReset,
+    resetPassword,
     logout,
   };
 

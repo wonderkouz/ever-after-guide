@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CreerRouteImport } from './routes/creer'
 import { Route as EspaceRouteImport } from './routes/espace'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as PlanningRouteImport } from './routes/planning'
+import { Route as ReinitialiserMotDePasseRouteImport } from './routes/reinitialiser-mot-de-passe'
 import { Route as SignupRouteImport } from './routes/signup'
 
 const IndexRoute = IndexRouteImport.update({
@@ -36,9 +38,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MotDePasseOublieRoute = MotDePasseOublieRouteImport.update({
+  id: '/mot-de-passe-oublie',
+  path: '/mot-de-passe-oublie',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlanningRoute = PlanningRouteImport.update({
   id: '/planning',
   path: '/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReinitialiserMotDePasseRoute = ReinitialiserMotDePasseRouteImport.update({
+  id: '/reinitialiser-mot-de-passe',
+  path: '/reinitialiser-mot-de-passe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -52,7 +64,9 @@ export interface FileRoutesByFullPath {
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
   '/login': typeof LoginRoute
+  '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/planning': typeof PlanningRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
@@ -60,7 +74,9 @@ export interface FileRoutesByTo {
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
   '/login': typeof LoginRoute
+  '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/planning': typeof PlanningRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
@@ -69,16 +85,42 @@ export interface FileRoutesById {
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
   '/login': typeof LoginRoute
+  '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/planning': typeof PlanningRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
+  fullPaths:
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/login'
+    | '/mot-de-passe-oublie'
+    | '/planning'
+    | '/reinitialiser-mot-de-passe'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
+  to:
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/login'
+    | '/mot-de-passe-oublie'
+    | '/planning'
+    | '/reinitialiser-mot-de-passe'
+    | '/signup'
   id:
-    '__root__' | '/' | '/creer' | '/espace' | '/login' | '/planning' | '/signup'
+    | '__root__'
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/login'
+    | '/mot-de-passe-oublie'
+    | '/planning'
+    | '/reinitialiser-mot-de-passe'
+    | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -86,7 +128,9 @@ export interface RootRouteChildren {
   CreerRoute: typeof CreerRoute
   EspaceRoute: typeof EspaceRoute
   LoginRoute: typeof LoginRoute
+  MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   PlanningRoute: typeof PlanningRoute
+  ReinitialiserMotDePasseRoute: typeof ReinitialiserMotDePasseRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -120,11 +164,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mot-de-passe-oublie': {
+      id: '/mot-de-passe-oublie'
+      path: '/mot-de-passe-oublie'
+      fullPath: '/mot-de-passe-oublie'
+      preLoaderRoute: typeof MotDePasseOublieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/planning': {
       id: '/planning'
       path: '/planning'
       fullPath: '/planning'
       preLoaderRoute: typeof PlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reinitialiser-mot-de-passe': {
+      id: '/reinitialiser-mot-de-passe'
+      path: '/reinitialiser-mot-de-passe'
+      fullPath: '/reinitialiser-mot-de-passe'
+      preLoaderRoute: typeof ReinitialiserMotDePasseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -142,7 +200,9 @@ const rootRouteChildren: RootRouteChildren = {
   CreerRoute: CreerRoute,
   EspaceRoute: EspaceRoute,
   LoginRoute: LoginRoute,
+  MotDePasseOublieRoute: MotDePasseOublieRoute,
   PlanningRoute: PlanningRoute,
+  ReinitialiserMotDePasseRoute: ReinitialiserMotDePasseRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
