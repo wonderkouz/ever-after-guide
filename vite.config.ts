@@ -15,4 +15,6 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Nitro preset pour le déploiement Vercel (ignoré dans le sandbox Base44 qui force cloudflare-module).
+  nitro: { preset: "vercel" },
 });

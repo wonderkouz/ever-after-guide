@@ -81,7 +81,26 @@ export function Base44AuthProvider({ children }: { children: ReactNode }) {
 
   const requestPasswordReset = async (email: string) => {
     const base44 = getBase44();
-    return base44.auth.resetPasswordRequest(email);
+    const { serverUrl, appId } = base44.getConfig();
+    const appUrl = import.meta.env.VITE_APP_URL;
+    const redirectUrl = appUrl
+      ? `${appUrl.replace(/\/$/, "")}/reinitialiser-mot-de-passe`
+      : undefined;
+    const res = await fetch(
+      `${serverUrl}/api/apps/${appId}/auth/reset-password-request`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          ...(redirectUrl ? { redirect_url: redirectUrl } : {}),
+        }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error("Erreur lors de la demande de réinitialisation du mot de passe.");
+    }
+    return res.json();
   };
 
   const resetPassword = async (resetToken: string, newPassword: string) => {
