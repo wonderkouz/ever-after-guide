@@ -19,12 +19,13 @@ const inputClass =
 function ResetPassword() {
   const navigate = useNavigate();
   const { resetPassword } = useBase44Auth();
-  const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const resetToken = new URLSearchParams(window.location.search).get("token") ?? "";
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -45,11 +46,33 @@ function ResetPassword() {
       setTimeout(() => navigate({ to: "/login" }), 2000);
     } catch (err) {
       setError(
-        getBase44ErrorMessage(err, "Le code de réinitialisation est invalide ou a expiré."),
+        getBase44ErrorMessage(err, "Le lien de réinitialisation est invalide ou a expiré."),
       );
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!resetToken) {
+    return (
+      <div className="min-h-screen bg-cream text-ink">
+        <AuthHeader />
+        <main className="mx-auto max-w-md px-5 py-12 sm:px-6 sm:py-20">
+          <h1 className="text-4xl font-light tracking-tight sm:text-5xl">
+            Lien invalide
+          </h1>
+          <p className="mt-3 text-ink-soft">
+            Ce lien de réinitialisation est invalide ou incomplet. Veuillez utiliser
+            le lien reçu dans l'e-mail de réinitialisation.
+          </p>
+          <p className="mt-6 text-center text-sm text-ink-soft">
+            <Link to="/mot-de-passe-oublie" className="font-medium text-clay-deep hover:underline">
+              Demander un nouveau lien
+            </Link>
+          </p>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -60,20 +83,9 @@ function ResetPassword() {
           Réinitialiser le mot de passe
         </h1>
         <p className="mt-3 text-ink-soft">
-          Saisissez le code reçu par e-mail et votre nouveau mot de passe.
+          Choisissez votre nouveau mot de passe.
         </p>
         <form onSubmit={submit} className="mt-8 space-y-5">
-          <label className="block">
-            <span className="text-sm font-medium">Code de réinitialisation</span>
-            <input
-              className={inputClass}
-              value={resetToken}
-              onChange={(e) => setResetToken(e.target.value)}
-              required
-              autoComplete="one-time-code"
-              placeholder="Code reçu par e-mail"
-            />
-          </label>
           <label className="block">
             <span className="text-sm font-medium">Nouveau mot de passe</span>
             <input
@@ -95,7 +107,7 @@ function ResetPassword() {
               onChange={(e) => setConfirm(e.target.value)}
               required
               autoComplete="new-password"
-              placeholder="••••••••"
+              placeholder="•••••••••"
             />
           </label>
           {error && <p className="text-sm text-clay-deep">{error}</p>}

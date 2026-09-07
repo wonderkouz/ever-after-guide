@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AuthHeader } from "@/components/auth-header";
 import { useBase44Auth, getBase44ErrorMessage } from "@/lib/base44/auth";
@@ -17,7 +17,6 @@ const inputClass =
   "mt-2 w-full rounded-xl border border-ink/10 bg-cream/60 px-4 py-3 text-base focus:border-clay focus:outline-none focus:ring-2 focus:ring-clay/20";
 
 function ForgotPassword() {
-  const navigate = useNavigate();
   const { requestPasswordReset } = useBase44Auth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -64,24 +63,13 @@ function ForgotPassword() {
           </label>
           {error && <p className="text-sm text-clay-deep">{error}</p>}
           {info && <p className="text-sm text-ink-soft">{info}</p>}
-          {info && (
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/reinitialiser-mot-de-passe" })}
-              className="w-full rounded-full bg-ink px-7 py-3.5 font-medium text-cream transition-colors hover:bg-clay-deep"
-            >
-              J'ai mon code, réinitialiser
-            </button>
-          )}
-          {!info && (
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-full bg-ink px-7 py-3.5 font-medium text-cream transition-colors hover:bg-clay-deep disabled:opacity-50"
-            >
-              {loading ? "Envoi…" : "Envoyer le lien"}
-            </button>
-          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-ink px-7 py-3.5 font-medium text-cream transition-colors hover:bg-clay-deep disabled:opacity-50"
+          >
+            {loading ? "Envoi…" : info ? "Renvoyer le lien" : "Envoyer le lien"}
+          </button>
         </form>
         <p className="mt-6 text-center text-sm text-ink-soft">
           <Link to="/login" className="font-medium text-clay-deep hover:underline">
