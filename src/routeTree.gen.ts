@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CreerRouteImport } from './routes/creer'
 import { Route as EspaceRouteImport } from './routes/espace'
+import { Route as InspirationsRouteImport } from './routes/inspirations'
+import { Route as InvitesRouteImport } from './routes/invites'
 import { Route as PlanningRouteImport } from './routes/planning'
+import { Route as PrestatairesRouteImport } from './routes/prestataires'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,9 +32,24 @@ const EspaceRoute = EspaceRouteImport.update({
   path: '/espace',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InspirationsRoute = InspirationsRouteImport.update({
+  id: '/inspirations',
+  path: '/inspirations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitesRoute = InvitesRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlanningRoute = PlanningRouteImport.update({
   id: '/planning',
   path: '/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrestatairesRoute = PrestatairesRouteImport.update({
+  id: '/prestataires',
+  path: '/prestataires',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +57,68 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/inspirations': typeof InspirationsRoute
+  '/invites': typeof InvitesRoute
   '/planning': typeof PlanningRoute
+  '/prestataires': typeof PrestatairesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/inspirations': typeof InspirationsRoute
+  '/invites': typeof InvitesRoute
   '/planning': typeof PlanningRoute
+  '/prestataires': typeof PrestatairesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/creer': typeof CreerRoute
   '/espace': typeof EspaceRoute
+  '/inspirations': typeof InspirationsRoute
+  '/invites': typeof InvitesRoute
   '/planning': typeof PlanningRoute
+  '/prestataires': typeof PrestatairesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/creer' | '/espace' | '/planning'
+  fullPaths:
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/inspirations'
+    | '/invites'
+    | '/planning'
+    | '/prestataires'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/creer' | '/espace' | '/planning'
-  id: '__root__' | '/' | '/creer' | '/espace' | '/planning'
+  to:
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/inspirations'
+    | '/invites'
+    | '/planning'
+    | '/prestataires'
+  id:
+    | '__root__'
+    | '/'
+    | '/creer'
+    | '/espace'
+    | '/inspirations'
+    | '/invites'
+    | '/planning'
+    | '/prestataires'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CreerRoute: typeof CreerRoute
   EspaceRoute: typeof EspaceRoute
+  InspirationsRoute: typeof InspirationsRoute
+  InvitesRoute: typeof InvitesRoute
   PlanningRoute: typeof PlanningRoute
+  PrestatairesRoute: typeof PrestatairesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +144,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inspirations': {
+      id: '/inspirations'
+      path: '/inspirations'
+      fullPath: '/inspirations'
+      preLoaderRoute: typeof InspirationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invites': {
+      id: '/invites'
+      path: '/invites'
+      fullPath: '/invites'
+      preLoaderRoute: typeof InvitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/planning': {
       id: '/planning'
       path: '/planning'
       fullPath: '/planning'
       preLoaderRoute: typeof PlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prestataires': {
+      id: '/prestataires'
+      path: '/prestataires'
+      fullPath: '/prestataires'
+      preLoaderRoute: typeof PrestatairesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,7 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreerRoute: CreerRoute,
   EspaceRoute: EspaceRoute,
+  InspirationsRoute: InspirationsRoute,
+  InvitesRoute: InvitesRoute,
   PlanningRoute: PlanningRoute,
+  PrestatairesRoute: PrestatairesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
