@@ -22,7 +22,7 @@ function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const resetToken = new URLSearchParams(window.location.search).get("token") ?? "";
@@ -30,7 +30,6 @@ function ResetPassword() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError("");
-    setInfo("");
     if (newPassword !== confirm) {
       setError("Les mots de passe ne correspondent pas.");
       return;
@@ -42,8 +41,7 @@ function ResetPassword() {
     setLoading(true);
     try {
       await resetPassword(resetToken, newPassword);
-      setInfo("Votre mot de passe a été réinitialisé avec succès.");
-      setTimeout(() => navigate({ to: "/login" }), 2000);
+      setSuccess(true);
     } catch (err) {
       setError(
         getBase44ErrorMessage(err, "Le lien de réinitialisation est invalide ou a expiré."),
@@ -70,6 +68,29 @@ function ResetPassword() {
               Demander un nouveau lien
             </Link>
           </p>
+        </main>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-cream text-ink">
+        <AuthHeader />
+        <main className="mx-auto max-w-md px-5 py-12 sm:px-6 sm:py-20">
+          <h1 className="text-4xl font-light tracking-tight sm:text-5xl">
+            Mot de passe réinitialisé
+          </h1>
+          <p className="mt-3 text-ink-soft">
+            Votre mot de passe a été réinitialisé avec succès. Vous pouvez
+            maintenant vous connecter avec votre nouveau mot de passe.
+          </p>
+          <button
+            onClick={() => navigate({ to: "/login" })}
+            className="mt-8 w-full rounded-full bg-ink px-7 py-3.5 font-medium text-cream transition-colors hover:bg-clay-deep"
+          >
+            Se connecter
+          </button>
         </main>
       </div>
     );
@@ -111,7 +132,6 @@ function ResetPassword() {
             />
           </label>
           {error && <p className="text-sm text-clay-deep">{error}</p>}
-          {info && <p className="text-sm text-ink-soft">{info}</p>}
           <button
             type="submit"
             disabled={loading}
