@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AuthHeader } from "@/components/auth-header";
 import { useBase44Auth, getBase44ErrorMessage } from "@/lib/base44/auth";
-import { RedirectIfAuth } from "@/lib/base44/require-auth";
+
 
 const inputClass =
   "mt-2 w-full rounded-xl border border-ink/10 bg-cream/60 px-4 py-3 text-base focus:border-clay focus:outline-none focus:ring-2 focus:ring-clay/20";
@@ -142,9 +142,5 @@ export function ResetPasswordForm() {
 }
 
 export function ResetPasswordPage() {
-  return (
-    <RedirectIfAuth>
-      <ResetPasswordForm />
-    </RedirectIfAuth>
-  );
+  return <ResetPasswordForm />;
 }
