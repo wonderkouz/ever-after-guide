@@ -1,0 +1,14 @@
+// Configuration du projet Base44 — Wedly
+{
+  "name": "wedly",
+  "description": "Wedly — copilote d'organisation de mariage",
+
+  // Hébergement du frontend (SPA statique).
+  // `bun run build` (mode SPA) génère ./dist/client/index.html + ./dist/client/assets.
+  // Le chemin est relatif à la racine du projet (dossier qui contient `base44/`).
+  "site": {
+    "outputDirectory": "./dist/client",
+    "buildCommand": "bun run build:spa",
+    "installCommand": "bun install",
+  },
+}

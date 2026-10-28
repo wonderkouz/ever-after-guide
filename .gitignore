@@ -20,6 +20,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Base44 CLI — lien local vers l'app (ne pas committer)
+base44/.app.jsonc
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

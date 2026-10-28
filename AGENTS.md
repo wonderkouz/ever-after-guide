@@ -88,3 +88,20 @@ Entities (`Wedding`, `Task`, …) and their permissions (owner/auth) are defined
 # appId present in the running container (don't print the value):
 docker compose -f docker-compose.base44.yml exec -T web sh -c 'printenv VITE_BASE44_APP_ID >/dev/null && echo present || echo missing'
 ```
+
+## Déploiement du frontend (SPA statique Base44)
+
+- `vite.config.ts` = dev/SSR (le preview). Ne PAS y activer `spa.enabled` :
+  TanStack Start dev ne le supporte pas (le serveur accepte la connexion mais ne
+  répond plus).
+- `vite.spa.config.ts` = build SPA uniquement (`bun run build:spa`) :
+  `spa.enabled` + `spa.prerender.outputPath: "/index.html"` + `nitro: false`.
+- Sortie : `dist/client/index.html` + `dist/client/assets` (gitignoré).
+  `base44/config.jsonc` → `site.outputDirectory: "./dist/client"` et
+  `site.buildCommand: "bun run build:spa"` (le CLI injecte `VITE_BASE44_APP_ID`).
+- Déploiement : `npx base44 login`, `npx base44 link`, puis
+  `npx base44 site deploy --build`. L'hébergement Base44 est SPA-only : toutes
+  les routes sont servies depuis `index.html`.
+- L'`appId` est figé au build : un build lancé sans `VITE_BASE44_APP_ID` produit
+  une app sans authentification.
+- `base44/.app.jsonc` (lien local vers l'app) ne doit pas être commité.
